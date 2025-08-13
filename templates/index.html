@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Typing Challenge</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Typing Challenge</h1>
+            <p id="status">Connecting to server...</p>
+        </header>
+
+        <main id="game-view">
+            <div id="announcement" class="hidden"></div>
+
+            <div id="round-view">
+                <div id="word-to-type-container">
+                    <p id="word-label">Type this:</p>
+                    <div id="word-to-type"></div>
+                </div>
+                <div id="timer-container">
+                    <p>Time Left</p>
+                    <div id="timer">10</div>
+                </div>
+            </div>
+
+            <div id="leaderboard-container">
+                <h2>Leaderboard</h2>
+                <table id="leaderboard">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Leaderboard rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
