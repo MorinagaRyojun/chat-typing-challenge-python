@@ -131,6 +131,28 @@ class Game:
             if self.leaderboard[user_id]['penalized']:
                 self.leaderboard[user_id]['penalized'] = False
 
+    async def set_game_mode(self, mode: str):
+        if mode in self.word_lists:
+            self.game_mode = mode
+            print(f"Game mode changed to: {mode}")
+            # Reset timer for speed up mode if changed to it
+            if self.game_mode == 'speed_up':
+                self.round_time_seconds = self.speed_up_start_time
+            await self.manager.broadcast({
+                "type": "game_mode_changed",
+                "mode": self.game_mode
+            })
+        else:
+            print(f"Attempted to change to invalid game mode: {mode}")
+
+    async def reset_leaderboard(self):
+        self.leaderboard.clear()
+        print("Leaderboard has been reset.")
+        await self.manager.broadcast({
+            "type": "leaderboard_update",
+            "leaderboard": []
+        })
+
     def get_leaderboard_data(self):
         if not self.leaderboard:
             return []

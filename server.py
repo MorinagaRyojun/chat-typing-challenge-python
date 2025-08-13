@@ -40,6 +40,15 @@ manager = ConnectionManager()
 # --- Game and TikTok Client Setup ---
 game = Game(manager)
 tiktok_client: TikTokLiveClient = TikTokLiveClient(unique_id=TIKTOK_USERNAME)
+auto_play_task = None
+
+# --- Game Control Functions ---
+async def run_auto_play_loop(delay: int):
+    """The main loop for automatic game rounds."""
+    while True:
+        await game.start_new_round()
+        await manager.broadcast({"type": "auto_play_status", "running": True, "delay": delay})
+        await asyncio.sleep(delay)
 
 # --- FastAPI Routes ---
 @app.get("/", response_class=HTMLResponse)
@@ -48,56 +57,65 @@ async def read_root(request: Request):
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global auto_play_task
     await manager.connect(websocket)
     try:
-        # Send the initial leaderboard state when a new UI connects
         await websocket.send_json({
             "type": "leaderboard_update",
             "leaderboard": game.get_leaderboard_data()
         })
         while True:
-            # Keep the connection alive
-            await websocket.receive_text()
+            data = await websocket.receive_json()
+
+            # Route commands from the UI
+            if data["type"] == "start_round":
+                if not game.round_active:
+                    asyncio.create_task(game.start_new_round())
+
+            elif data["type"] == "set_game_mode":
+                await game.set_game_mode(data["mode"])
+
+            elif data["type"] == "reset_leaderboard":
+                await game.reset_leaderboard()
+
+            elif data["type"] == "start_auto_play":
+                if auto_play_task is None or auto_play_task.done():
+                    delay = int(data.get("delay", 15))
+                    auto_play_task = asyncio.create_task(run_auto_play_loop(delay))
+                    await manager.broadcast({"type": "auto_play_status", "running": True, "delay": delay})
+
+            elif data["type"] == "stop_auto_play":
+                if auto_play_task and not auto_play_task.done():
+                    auto_play_task.cancel()
+                    auto_play_task = None
+                await manager.broadcast({"type": "auto_play_status", "running": False})
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         print("UI disconnected.")
+    except Exception as e:
+        print(f"An error occurred in websocket: {e}")
+
 
 # --- TikTok Event Handlers ---
 @tiktok_client.on(ConnectEvent)
 async def on_connect(event: ConnectEvent):
     print(f"Successfully connected to @{event.unique_id} (Room ID: {tiktok_client.room_id})")
     await manager.broadcast({"type": "tiktok_connected"})
-    # Start the game loop once connected
-    asyncio.create_task(run_game_loop())
 
 @tiktok_client.on(CommentEvent)
 async def on_comment(event: CommentEvent):
-    # Pass the comment to the game logic
     await game.check_answer(user_id=event.user.unique_id, nickname=event.user.nickname, comment=event.comment)
 
-# --- Game Loop ---
-async def run_game_loop():
-    await asyncio.sleep(5)
-    while True:
-        await game.start_new_round()
-        await asyncio.sleep(15) # Wait before starting the next round
 
 # --- FastAPI Startup Event ---
 @app.on_event("startup")
 async def startup_event():
     print("FastAPI server started. Attempting to connect to TikTok...")
-    # Start the TikTok client in the background
     asyncio.create_task(tiktok_client.start())
 
 if __name__ == "__main__":
     import uvicorn
-    # --- Game Configuration ---
-    # You can change the game mode here before starting the server.
     game.game_mode = "classic"
-
-    if game.game_mode == "speed_up":
-        game.round_time_seconds = game.speed_up_start_time
-
     print("Starting server with Uvicorn.")
-    print(f"Selected Game Mode: {game.game_mode.capitalize()}")
     uvicorn.run(app, host="0.0.0.0", port=8000)

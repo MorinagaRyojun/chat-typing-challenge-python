@@ -113,3 +113,51 @@ header h1 {
 .hidden {
     display: none;
 }
+
+#control-panel {
+    background-color: #323232;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+#control-panel h2 {
+    margin-top: 0;
+    color: #aaa;
+    font-size: 1.2em;
+}
+
+.control-group {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.control-sub-panel {
+    margin: 15px 0;
+}
+
+#control-panel button {
+    background-color: #64ffda;
+    color: #1a1a1a;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#control-panel button:hover {
+    background-color: #52c7b1;
+}
+
+#control-panel select, #control-panel input[type="number"] {
+    background-color: #424242;
+    color: white;
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 5px;
+}
