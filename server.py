@@ -72,12 +72,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     await manager.broadcast({"type": "status_update", "message": f"Connecting to {game_settings['username']}..."})
 
                     # Define handlers here to close over the current game and manager instances
-                    @TikTokLive.on(ConnectEvent)
                     async def on_connect(event: ConnectEvent):
                         print(f"Successfully connected to @{event.unique_id}")
                         await manager.broadcast({"type": "tiktok_connected"})
 
-                    @TikTokLive.on(CommentEvent)
                     async def on_comment(event: CommentEvent):
                         await game.check_answer(user_id=event.user.unique_id, nickname=event.user.nickname, comment=event.comment)
 
