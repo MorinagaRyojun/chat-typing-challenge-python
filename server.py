@@ -1,6 +1,6 @@
 import asyncio
 import json
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -43,7 +43,7 @@ tiktok_client: TikTokLiveClient = TikTokLiveClient(unique_id=TIKTOK_USERNAME)
 
 # --- FastAPI Routes ---
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request):
+async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.websocket("/ws")
