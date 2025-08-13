@@ -2,3 +2,4 @@ TikTokLive
 fastapi
 uvicorn[standard]
 jinja2
+anyio==3.7.1
