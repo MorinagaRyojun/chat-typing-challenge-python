@@ -12,20 +12,53 @@
             <p id="status">Connecting to server...</p>
         </header>
 
+        <div id="control-panel">
+            <h2>Control Panel</h2>
+            <div class="control-group">
+                <label for="game-mode-select">Game Mode:</label>
+                <select id="game-mode-select">
+                    <option value="classic">Classic</option>
+                    <option value="hard">Hard</option>
+                    <option value="sentence">Sentence</option>
+                    <option value="emoji">Emoji</option>
+                    <option value="speed_up">Speed Up</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Play Style:</label>
+                <input type="radio" id="mode-manual" name="play_style" value="manual" checked>
+                <label for="mode-manual">Manual</label>
+                <input type="radio" id="mode-auto" name="play_style" value="auto">
+                <label for="mode-auto">Automatic</label>
+            </div>
+
+            <div id="manual-controls" class="control-sub-panel">
+                <button id="start-round-btn">Start Next Round</button>
+            </div>
+
+            <div id="auto-controls" class="control-sub-panel hidden">
+                <label for="auto-delay-input">Delay (s):</label>
+                <input type="number" id="auto-delay-input" value="15" min="5">
+                <button id="toggle-auto-play-btn">Start Auto-Play</button>
+            </div>
+
+            <div class="control-group">
+                 <button id="reset-leaderboard-btn">Reset Leaderboard</button>
+            </div>
+        </div>
+
         <main id="game-view">
             <div id="announcement" class="hidden"></div>
-
             <div id="round-view">
                 <div id="word-to-type-container">
                     <p id="word-label">Type this:</p>
-                    <div id="word-to-type"></div>
+                    <div id="word-to-type">-- Waiting to Start --</div>
                 </div>
                 <div id="timer-container">
                     <p>Time Left</p>
-                    <div id="timer">10</div>
+                    <div id="timer">--</div>
                 </div>
             </div>
-
             <div id="leaderboard-container">
                 <h2>Leaderboard</h2>
                 <table id="leaderboard">
