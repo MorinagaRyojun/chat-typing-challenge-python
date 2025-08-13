@@ -18,9 +18,52 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
+header {
+    position: relative;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+}
+
 header h1 {
     margin: 0;
     color: #64ffda; /* A minty green color */
+}
+
+.back-link {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.back-link:hover {
+    color: #fff;
+}
+
+#connection-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#connect-tiktok-btn {
+    background-color: #e62f5a; /* TikTok-ish red */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#connect-tiktok-btn:hover {
+    background-color: #c42249;
 }
 
 #status {

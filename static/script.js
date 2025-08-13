@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const wordToType = document.getElementById("word-to-type");
     const timer = document.getElementById("timer");
     const leaderboardBody = document.querySelector("#leaderboard tbody");
+    const connectTiktokBtn = document.getElementById("connect-tiktok-btn");
 
     // Control Panel Elements
     const gameModeSelect = document.getElementById("game-mode-select");
@@ -29,8 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
         socket = new WebSocket(`${protocol}//${host}/ws`);
 
         socket.onopen = () => {
-            status.textContent = "Connected to Game Server";
+            status.textContent = "Connected to Game Server. Ready to connect to TikTok.";
             status.style.color = "#64ffda";
+            connectTiktokBtn.disabled = false;
         };
 
         socket.onmessage = (event) => {
@@ -41,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.onclose = () => {
             status.textContent = "Disconnected. Trying to reconnect...";
             status.style.color = "#ff6b6b";
+            connectTiktokBtn.disabled = true;
             isAutoPlaying = false;
             updateAutoPlayButton();
             setTimeout(connect, 3000);
@@ -86,8 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateLeaderboard(data.leaderboard);
                 break;
             case "tiktok_connected":
-                status.textContent = "Connected to TikTok LIVE";
-                showAnnouncement("Connected to TikTok!", 3000);
+                status.textContent = "Connected to TikTok LIVE!";
+                status.style.color = "#25d366"; // A nice green
+                connectTiktokBtn.style.display = 'none'; // Hide button after connecting
+                break;
+            case "status_update":
+                status.textContent = data.message;
                 break;
             case "auto_play_status":
                 isAutoPlaying = data.running;
@@ -97,6 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Control Panel Logic ---
+    connectTiktokBtn.addEventListener('click', () => {
+        send({ type: 'connect_tiktok' });
+        connectTiktokBtn.disabled = true;
+        status.textContent = "Attempting to connect to TikTok...";
+    });
+
     modeManualRadio.addEventListener('change', () => {
         manualControls.classList.remove('hidden');
         autoControls.classList.add('hidden');
