@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const generateBtn = document.getElementById("generate-btn");
     const loadingSpinner = document.getElementById("loading-spinner");
     const monsterPlaceholderText = document.getElementById("monster-placeholder-text");
+    const participantsList = document.getElementById("participants-list");
 
     // --- State ---
     let socket;
@@ -54,6 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
             case "parts_update":
                 updatePartsList(data.parts);
                 break;
+            case "participants_update":
+                updateParticipantsList(data.participants);
+                break;
             case "monster_generated":
                 loadingSpinner.classList.add("hidden");
                 displayMonster(data.image_url, data.prompt);
@@ -98,6 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const li = document.createElement("li");
                 li.textContent = part;
                 partsList.appendChild(li);
+            });
+        }
+    }
+
+    function updateParticipantsList(participants) {
+        participantsList.innerHTML = "";
+        if (participants.length === 0) {
+            participantsList.innerHTML = "<li>Waiting for chatters...</li>";
+        } else {
+            participants.forEach(name => {
+                const li = document.createElement("li");
+                li.textContent = name;
+                participantsList.appendChild(li);
             });
         }
     }
