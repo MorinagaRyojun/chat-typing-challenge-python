@@ -8,7 +8,17 @@
 <body>
     <div class="container">
         <h1>Game Hub</h1>
-        <p>Select a game to start.</p>
+        <p>Connect to your TikTok LIVE, then select a game to start.</p>
+
+        <div id="hub-connection-area">
+            <div id="tiktok-status">
+                <span id="tiktok-status-light" class="disconnected"></span>
+                <span id="tiktok-status-text">Disconnected</span>
+            </div>
+            <input type="text" id="tiktok-username" placeholder="@your_username">
+            <button id="connect-btn">Connect</button>
+        </div>
+
         <div class="game-list">
             <a href="/game/typing_challenge" class="game-card">
                 <h2>Typing Challenge</h2>
