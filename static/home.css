@@ -21,8 +21,81 @@ h1 {
 
 .container > p {
     color: #aaa;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     font-size: 1.2em;
+}
+
+#hub-connection-area {
+    background-color: #242424;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #333;
+}
+
+#tiktok-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+#tiktok-status-light {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+#tiktok-status-light.disconnected {
+    background-color: #ff6b6b; /* Red */
+}
+
+#tiktok-status-light.connected {
+    background-color: #25d366; /* Green */
+}
+
+#tiktok-status-light.connecting {
+    background-color: #ffcc00; /* Yellow */
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+#hub-connection-area input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #424242;
+    color: white;
+}
+
+#hub-connection-area button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #e62f5a;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#hub-connection-area button:hover {
+    background-color: #c42249;
+}
+
+#hub-connection-area button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
 }
 
 .game-list {
