@@ -25,9 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- WebSocket Connection ---
     function connect() {
+        const path = window.location.pathname;
+        const gameName = path.split('/')[2];
+
+        if (!gameName) {
+            status.textContent = "Error: Could not determine game name from URL.";
+            return;
+        }
+
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.host;
-        socket = new WebSocket(`${protocol}//${host}/ws`);
+        const wsUrl = `${protocol}//${host}/ws/${gameName}`;
+
+        socket = new WebSocket(wsUrl);
 
         socket.onopen = () => {
             status.textContent = "Connected to Game Server. Ready to connect to TikTok.";
