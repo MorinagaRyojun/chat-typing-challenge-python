@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const wordToType = document.getElementById("word-to-type");
     const timer = document.getElementById("timer");
     const leaderboardBody = document.querySelector("#leaderboard tbody");
+    const participantsList = document.getElementById("participants-list");
     const connectTiktokBtn = document.getElementById("connect-tiktok-btn");
 
     // Control Panel Elements
@@ -40,9 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         socket = new WebSocket(wsUrl);
 
         socket.onopen = () => {
-            status.textContent = "Connected to Game Server. Ready to connect to TikTok.";
-            status.style.color = "#64ffda";
-            connectTiktokBtn.disabled = false;
+            // This is a game-specific socket, the hub socket handles the main connection status
         };
 
         socket.onmessage = (event) => {
@@ -51,17 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         socket.onclose = () => {
-            status.textContent = "Disconnected. Trying to reconnect...";
-            status.style.color = "#ff6b6b";
-            connectTiktokBtn.disabled = true;
-            isAutoPlaying = false;
-            updateAutoPlayButton();
-            setTimeout(connect, 3000);
-        };
-
-        socket.onerror = (error) => {
-            console.error("WebSocket Error:", error);
-            status.textContent = "Connection Error";
+            // Game-specific socket closed
         };
     }
 
@@ -98,13 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
             case "leaderboard_update":
                 updateLeaderboard(data.leaderboard);
                 break;
-            case "tiktok_connected":
-                status.textContent = "Connected to TikTok LIVE!";
-                status.style.color = "#25d366"; // A nice green
-                connectTiktokBtn.style.display = 'none'; // Hide button after connecting
-                break;
-            case "status_update":
-                status.textContent = data.message;
+            case "participants_update":
+                updateParticipantsList(data.participants);
                 break;
             case "auto_play_status":
                 isAutoPlaying = data.running;
@@ -114,11 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Control Panel Logic ---
-    connectTiktokBtn.addEventListener('click', () => {
-        send({ type: 'connect_tiktok' });
-        connectTiktokBtn.disabled = true;
-        status.textContent = "Attempting to connect to TikTok...";
-    });
+    // Note: The main connection logic is now on the home page (home.js)
 
     modeManualRadio.addEventListener('change', () => {
         manualControls.classList.remove('hidden');
@@ -177,6 +157,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${player.score}</td>
                 `;
                 leaderboardBody.appendChild(row);
+            });
+        }
+    }
+
+    function updateParticipantsList(participants) {
+        participantsList.innerHTML = "";
+        if (participants.length === 0) {
+            participantsList.innerHTML = "<li>Waiting for chatters...</li>";
+        } else {
+            participants.forEach(name => {
+                const li = document.createElement("li");
+                li.textContent = name;
+                participantsList.appendChild(li);
             });
         }
     }

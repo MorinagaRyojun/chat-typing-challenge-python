@@ -8,7 +8,7 @@ from typing import List, Optional, Dict, Any
 
 # Import the base TikTok client
 from TikTokLive import TikTokLiveClient
-from TikTokLive.events import CommentEvent, ConnectEvent
+from TikTokLive.events import CommentEvent, ConnectEvent, User
 
 # Try to import API keys from config.py
 try:
@@ -33,10 +33,8 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket, group: str):
         if group in self.connections: self.connections[group].remove(websocket)
     async def broadcast(self, message: dict, group: Optional[str] = None):
-        # If group is specified, broadcast only to that group
         if group and group in self.connections:
             for connection in self.connections[group]: await connection.send_json(message)
-        # If no group is specified, broadcast to everyone
         elif group is None:
             for group_name in self.connections:
                 for connection in self.connections[group_name]: await connection.send_json(message)
@@ -44,7 +42,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 tiktok_client: Optional[TikTokLiveClient] = None
 game_instances: Dict[str, Any] = {}
-active_game_name: Optional[str] = None
+chat_participants: Dict[str, str] = {} # {unique_id: nickname}
 tiktok_username: Optional[str] = None
 
 # --- Helper function to get/create game instance ---
@@ -102,17 +100,17 @@ async def websocket_hub_endpoint(websocket: WebSocket):
 
 @app.websocket("/ws/{game_name}")
 async def websocket_game_endpoint(websocket: WebSocket, game_name: str):
-    global active_game_name
     game = get_game_instance(game_name)
     if not game:
         await websocket.close(code=1011, reason="Game not found")
         return
 
     await manager.connect(websocket, game_name)
-    active_game_name = game_name
-    print(f"Active game is now: {active_game_name}")
     try:
+        # Send initial state
         await websocket.send_json({"type": "leaderboard_update", "leaderboard": game.get_leaderboard_data()})
+        await websocket.send_json({"type": "participants_update", "participants": list(chat_participants.values())})
+
         while True:
             data = await websocket.receive_json()
             if game_name == "typing_challenge":
@@ -130,14 +128,27 @@ async def websocket_game_endpoint(websocket: WebSocket, game_name: str):
 
 # --- TikTok Event Handlers ---
 async def on_connect(event: ConnectEvent):
+    global chat_participants
+    chat_participants.clear() # Clear participants for new session
     print(f"Successfully connected to @{event.unique_id}")
     await manager.broadcast({"type": "tiktok_connection_status", "status": "connected", "message": f"Connected to @{event.unique_id}"})
+    await manager.broadcast({"type": "participants_update", "participants": []})
 
 async def on_comment(event: CommentEvent):
-    if active_game_name and active_game_name in game_instances:
-        active_game = game_instances[active_game_name]
-        if hasattr(active_game, 'handle_comment'):
-            await active_game.handle_comment(event.comment)
+    # Add user to participants list if they are new
+    is_new_participant = event.user.unique_id not in chat_participants
+    chat_participants[event.user.unique_id] = event.user.nickname
+
+    if is_new_participant:
+        await manager.broadcast({
+            "type": "participants_update",
+            "participants": list(chat_participants.values())
+        })
+
+    # Route comment to all active game instances
+    for game in game_instances.values():
+        if hasattr(game, 'handle_comment'):
+            asyncio.create_task(game.handle_comment(event.comment))
 
 # --- Server Lifecycle ---
 @app.on_event("startup")

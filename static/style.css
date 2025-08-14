@@ -126,8 +126,17 @@ header h1 {
     color: #ff6b6b; /* A reddish color for urgency */
 }
 
-#leaderboard-container {
+.game-info-layout {
+    display: flex;
+    gap: 20px;
     margin-top: 30px;
+}
+
+#leaderboard-container, #participants-container {
+    flex: 1;
+    background-color: #323232;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 #leaderboard {
@@ -212,6 +221,13 @@ header h1 {
     gap: 20px;
 }
 
+.side-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 #parts-container, #generation-container {
     background-color: #323232;
     padding: 20px;
@@ -222,6 +238,7 @@ header h1 {
 #parts-container {
     position: relative; /* For background GIF positioning */
     overflow: hidden;
+    flex-grow: 1;
 }
 
 .parts-bg-animation {
@@ -236,14 +253,17 @@ header h1 {
     z-index: 0;
 }
 
-#parts-list {
+#parts-list, #participants-list {
     list-style-type: none;
     padding: 0;
-    position: relative; /* To appear above the background GIF */
+    position: relative;
     z-index: 1;
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
 }
 
-#parts-list li {
+#parts-list li, #participants-list li {
     background-color: #424242;
     padding: 10px;
     margin-bottom: 5px;
