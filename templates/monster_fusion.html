@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monster Fusion</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">← Back to Home Menu</a>
+            <h1>Monster Fusion</h1>
+            <p id="status">Connect your TikTok LIVE to begin.</p>
+        </header>
+
+        <div id="monster-fusion-game">
+            <div class="game-layout">
+                <div id="parts-container">
+                    <h2>Collected Monster Parts</h2>
+                    <ul id="parts-list">
+                        <li>Waiting for viewers...</li>
+                    </ul>
+                </div>
+                <div id="generation-container">
+                    <h2>Monster Generation</h2>
+                    <div id="monster-display">
+                        <p>Your generated monster will appear here.</p>
+                    </div>
+                    <div class="control-panel" style="margin-top: 20px;">
+                        <div class="control-group">
+                            <label for="api-select">Image API:</label>
+                            <select id="api-select">
+                                <option value="gemini">Gemini</option>
+                                <option value="gpt">GPT</option>
+                            </select>
+                        </div>
+                        <button id="generate-btn">Generate Monster</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/monster_fusion.js"></script>
+</body>
+</html>
