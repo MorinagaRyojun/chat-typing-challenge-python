@@ -8,7 +8,7 @@ from typing import List, Optional, Dict, Any
 
 # Import the base TikTok client
 from TikTokLive import TikTokLiveClient
-from TikTokLive.events import CommentEvent, ConnectEvent, User
+from TikTokLive.events import CommentEvent, ConnectEvent
 
 # Try to import API keys from config.py
 try:
