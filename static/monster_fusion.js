@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const monsterDisplay = document.getElementById("monster-display");
     const apiSelect = document.getElementById("api-select");
     const generateBtn = document.getElementById("generate-btn");
+    const loadingSpinner = document.getElementById("loading-spinner");
+    const monsterPlaceholderText = document.getElementById("monster-placeholder-text");
 
     // --- State ---
     let socket;
@@ -53,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 updatePartsList(data.parts);
                 break;
             case "monster_generated":
+                loadingSpinner.classList.add("hidden");
                 displayMonster(data.image_url, data.prompt);
                 status.textContent = "Monster generated successfully!";
                 generateBtn.disabled = false;
@@ -62,12 +65,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 break;
             case "generation_error":
                 alert(data.message);
+                loadingSpinner.classList.add("hidden");
+                monsterPlaceholderText.classList.remove("hidden");
                 generateBtn.disabled = false;
                 break;
         }
     }
 
     generateBtn.addEventListener('click', () => {
+        // Clear previous results and show spinner
+        monsterDisplay.innerHTML = ""; // Clear previous image
+        monsterDisplay.appendChild(loadingSpinner); // Move spinner into display
+        monsterDisplay.appendChild(monsterPlaceholderText); // Move placeholder text too
+        monsterPlaceholderText.classList.add("hidden");
+        loadingSpinner.classList.remove("hidden");
+
         send({
             type: 'generate_monster',
             api: apiSelect.value
@@ -91,7 +103,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function displayMonster(imageUrl, prompt) {
-        monsterDisplay.innerHTML = `<img src="${imageUrl}" alt="${prompt}" style="max-width: 100%; border-radius: 8px;">`;
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = prompt;
+        img.style.maxWidth = "100%";
+        img.style.borderRadius = "8px";
+        monsterDisplay.innerHTML = ""; // Clear spinner
+        monsterDisplay.appendChild(img);
     }
 
     // --- Initialization ---
