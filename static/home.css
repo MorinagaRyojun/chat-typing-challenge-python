@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 40px;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+h1 {
+    color: #64ffda;
+    margin-bottom: 10px;
+}
+
+.container > p {
+    color: #aaa;
+    margin-bottom: 40px;
+    font-size: 1.2em;
+}
+
+.game-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.game-card {
+    background-color: #242424;
+    padding: 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #333;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.game-card h2 {
+    margin-top: 0;
+    color: #64ffda;
+}
+
+.game-card p {
+    color: #ccc;
+}
+
+.game-card.disabled {
+    background-color: #202020;
+    color: #555;
+    pointer-events: none; /* Make it unclickable */
+}
+
+.game-card.disabled h2 {
+    color: #444;
+}
