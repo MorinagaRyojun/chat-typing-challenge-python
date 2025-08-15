@@ -8,9 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadingSpinner = document.getElementById("loading-spinner");
     const monsterPlaceholderText = document.getElementById("monster-placeholder-text");
     const participantsList = document.getElementById("participants-list");
+    const chatLog = document.getElementById("chat-log");
 
     // --- State ---
     let socket;
+    const MAX_CHAT_MESSAGES = 50;
 
     // --- WebSocket Connection ---
     function connect() {
@@ -52,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Event Handlers ---
     function handleServerMessage(data) {
         switch (data.type) {
+            case "chat_message":
+                addChatMessage(data.user, data.comment);
+                break;
             case "parts_update":
                 updatePartsList(data.parts);
                 break;
@@ -77,10 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     generateBtn.addEventListener('click', () => {
-        // Clear previous results and show spinner
-        monsterDisplay.innerHTML = ""; // Clear previous image
-        monsterDisplay.appendChild(loadingSpinner); // Move spinner into display
-        monsterDisplay.appendChild(monsterPlaceholderText); // Move placeholder text too
+        monsterDisplay.innerHTML = "";
+        monsterDisplay.appendChild(loadingSpinner);
+        monsterDisplay.appendChild(monsterPlaceholderText);
         monsterPlaceholderText.classList.add("hidden");
         loadingSpinner.classList.remove("hidden");
 
@@ -117,6 +121,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 participantsList.appendChild(li);
             });
         }
+    }
+
+    function addChatMessage(user, comment) {
+        // Clear initial message if it exists
+        const initialMessage = chatLog.querySelector('.chat-message-system');
+        if(initialMessage) initialMessage.remove();
+
+        if (chatLog.children.length > MAX_CHAT_MESSAGES) {
+            chatLog.removeChild(chatLog.firstChild);
+        }
+        const messageElement = document.createElement("p");
+        messageElement.classList.add("chat-message");
+
+        const userSpan = document.createElement("span");
+        userSpan.classList.add("chat-message-user");
+        userSpan.textContent = user;
+
+        const textSpan = document.createElement("span");
+        textSpan.classList.add("chat-message-text");
+        textSpan.textContent = `: ${comment}`;
+
+        messageElement.appendChild(userSpan);
+        messageElement.appendChild(textSpan);
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
 
     function displayMonster(imageUrl, prompt) {

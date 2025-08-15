@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timer = document.getElementById("timer");
     const leaderboardBody = document.querySelector("#leaderboard tbody");
     const participantsList = document.getElementById("participants-list");
-    const connectTiktokBtn = document.getElementById("connect-tiktok-btn");
+    const chatLog = document.getElementById("chat-log");
 
     // Control Panel Elements
     const gameModeSelect = document.getElementById("game-mode-select");
@@ -23,16 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- State ---
     let socket;
     let isAutoPlaying = false;
+    const MAX_CHAT_MESSAGES = 50;
 
     // --- WebSocket Connection ---
     function connect() {
         const path = window.location.pathname;
         const gameName = path.split('/')[2];
 
-        if (!gameName) {
-            status.textContent = "Error: Could not determine game name from URL.";
-            return;
-        }
+        if (!gameName) { return; }
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.host;
@@ -40,31 +38,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         socket = new WebSocket(wsUrl);
 
-        socket.onopen = () => {
-            // This is a game-specific socket, the hub socket handles the main connection status
-        };
-
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             handleServerMessage(data);
-        };
-
-        socket.onclose = () => {
-            // Game-specific socket closed
         };
     }
 
     function send(data) {
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify(data));
-        } else {
-            console.error("WebSocket is not connected.");
         }
     }
 
     // --- Event Handlers ---
     function handleServerMessage(data) {
         switch (data.type) {
+            case "chat_message":
+                addChatMessage(data.user, data.comment);
+                break;
             case "new_round":
                 wordLabel.textContent = data.mode === 'Hard' ? "Unscramble this:" : "Type this:";
                 wordToType.textContent = data.word;
@@ -98,8 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Control Panel Logic ---
-    // Note: The main connection logic is now on the home page (home.js)
-
     modeManualRadio.addEventListener('change', () => {
         manualControls.classList.remove('hidden');
         autoControls.classList.add('hidden');
@@ -151,11 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             leaderboardData.forEach((player, index) => {
                 const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>#${index + 1}</td>
-                    <td>${player.nickname}</td>
-                    <td>${player.score}</td>
-                `;
+                row.innerHTML = `<td>#${index + 1}</td><td>${player.nickname}</td><td>${player.score}</td>`;
                 leaderboardBody.appendChild(row);
             });
         }
@@ -172,6 +157,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 participantsList.appendChild(li);
             });
         }
+    }
+
+    function addChatMessage(user, comment) {
+        if (chatLog.children.length > MAX_CHAT_MESSAGES) {
+            chatLog.removeChild(chatLog.firstChild);
+        }
+        const messageElement = document.createElement("p");
+        messageElement.classList.add("chat-message");
+
+        const userSpan = document.createElement("span");
+        userSpan.classList.add("chat-message-user");
+        userSpan.textContent = user;
+
+        const textSpan = document.createElement("span");
+        textSpan.classList.add("chat-message-text");
+        textSpan.textContent = `: ${comment}`;
+
+        messageElement.appendChild(userSpan);
+        messageElement.appendChild(textSpan);
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
     }
 
     function showAnnouncement(message, duration) {
