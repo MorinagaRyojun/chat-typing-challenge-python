@@ -135,6 +135,13 @@ async def on_connect(event: ConnectEvent):
     await manager.broadcast({"type": "participants_update", "participants": []})
 
 async def on_comment(event: CommentEvent):
+    # Broadcast the raw chat message to all UIs for the live chat log
+    await manager.broadcast({
+        "type": "chat_message",
+        "user": event.user.nickname,
+        "comment": event.comment
+    })
+
     # Add user to participants list if they are new
     is_new_participant = event.user.unique_id not in chat_participants
     chat_participants[event.user.unique_id] = event.user.nickname
